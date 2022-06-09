@@ -10,18 +10,21 @@
 #include "SFML/Audio.hpp"
 #include "SFML/Network.hpp"
 
+#include "Direction.h"
 class CMap
 {
 public:
 	CMap();
 
+	void Render(sf::RenderTarget*);
+	bool UpdateCollision(float&, float&, const DIRECTION&);
 private:
 
 	std::vector<std::string> mMapSketch = {
 		"                            ",
 		"                            ",
 		"                            ",
-		"############################",
+		"# ##########################",
 		"#            ##            #",
 		"# #### ##### ## ##### #### #",
 		"# #  # #   # ## #   # #  # #",
@@ -54,6 +57,16 @@ private:
 		"############################",
 		"                            ",
 		"                            ",
-	}
+	};
+
+	//Walls
+	sf::Sprite mWalls;
+	sf::Texture mWallsTexture;
+
+	void InitVariables();
+	void InitMap();
+
+	void InitWalls();
+
 };
 

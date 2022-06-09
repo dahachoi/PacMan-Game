@@ -11,6 +11,9 @@
 #include "SFML/Audio.hpp"
 #include "SFML/Network.hpp"
 
+#include "CMap.h"
+#include "CPacMan.h"
+
 class CGame
 {
 public:
@@ -33,6 +36,8 @@ private:
 	const unsigned HEIGHT = 972;
 
 	//Game Objects
+	CMap iMap;
+	CPacMan iPacMan;
 
 	//Functions
 	void PollEvents();
@@ -40,5 +45,11 @@ private:
 	//Initialization Functions
 	void InitWindow();
 	void InitVariables();
+
+	//Update
+	void UpdatePacMan();
+	void UpdateCollision();
+	//Render
+	void RenderMap();
 };
 
