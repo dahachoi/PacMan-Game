@@ -53,6 +53,7 @@ private:
 	void UpdatePacMan();
 	void UpdateCollision();
 	//Render
+	void RenderTestGhost();
 	void RenderMap();
 };
 

@@ -98,6 +98,19 @@ void CGame::UpdateCollision() {
 
 //Render
 
+void CGame::RenderTestGhost() {
+	sf::Sprite ghost;
+	sf::Texture ghostTexture;
+	ghostTexture.loadFromFile("Game_Resources/Ghosts/CyanDown.png");
+
+	ghost.setTexture(ghostTexture);
+	ghost.setOrigin(ghost.getGlobalBounds().width / 2, ghost.getGlobalBounds().height / 2);
+
+	ghost.setPosition(9 * 27 + 13, 14 * 27 + 13);
+
+	mWindow->draw(ghost);
+}
+
 void CGame::RenderMap() {
 	iMap.Render(mWindow);
 	iPacMan.Render(mWindow);
@@ -115,6 +128,7 @@ void CGame::Render() {
 	mWindow->clear();
 	//render objects
 	RenderMap();
+	RenderTestGhost();
 
 	mWindow->display();
 }
