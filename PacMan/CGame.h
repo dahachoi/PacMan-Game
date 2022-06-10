@@ -38,6 +38,9 @@ private:
 	//Game Objects
 	CMap iMap;
 	CPacMan iPacMan;
+	short unsigned mScore;
+	const short unsigned mMaxScore;
+	short unsigned mGainPoints;
 
 	//Functions
 	void PollEvents();

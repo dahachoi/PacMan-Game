@@ -2,7 +2,9 @@
 
 using namespace std;
 
-CGame::CGame() {
+CGame::CGame() 
+	: mMaxScore(2600)
+{
 	InitVariables();
 	InitWindow();
 }
@@ -31,6 +33,8 @@ const bool CGame::Running() const {
 
 void CGame::InitVariables() {
 	mEndGame = false;
+	mScore = 0;
+	mGainPoints = 10;
 }
 
 void CGame::InitWindow() {
@@ -53,12 +57,12 @@ void CGame::UpdateCollision() {
 
 	//side of screen
 	if (pacManX <= 0) {
-		//if (pacManX == 0) {
-		//	iCoins.UpdateCollision(pacManX, pacManY);
-		//}
+		if (pacManX == 0) {
+			iMap.UpdateCoinCollision(pacManX, pacManY);
+		}
 
 		if (pacManX == -pacManWidth * 2 && pacManY == 17.f * 27.f) {
-			iPacMan.SetPosition(float(WIDTH) + pacManWidth, pacManY + 13.f);
+			iPacMan.SetPosition(float(WIDTH) + pacManWidth + 13, pacManY + 13.f);
 		}
 		return;
 	}
@@ -71,14 +75,25 @@ void CGame::UpdateCollision() {
 
 	// Collision with wall
 	if (fmod(pacManX, 27) == 0.0 && fmod(pacManY, 27) == 0.0 || iPacMan.IsStopped()) {
-		if (!iMap.UpdateCollision(pacManX, pacManY, iPacMan.GetQuedDir())) {
+		if (!iMap.UpdateWallCollision(pacManX, pacManY, iPacMan.GetQuedDir())) {
 			iPacMan.SwitchDirection();
 		}
-		else if (iMap.UpdateCollision(pacManX, pacManY, iPacMan.GetCurrDir())) {
+		else if (iMap.UpdateWallCollision(pacManX, pacManY, iPacMan.GetCurrDir())) {
 			iPacMan.StopPacMan();
 		}
+
+		if (int gainPoints = iMap.UpdateCoinCollision(pacManX, pacManY)) {
+			//cout << "Collision! gained : " << gainPoints << endl;
+			mScore += gainPoints;
+			cout << "mScore : " << mScore << endl;
+			//cout << "mScore : " << mScore << endl;
+			if (mScore == mMaxScore) {
+				cout << "end game" << endl;
+				//mEndGame = true;
+			}
+		}
 	}
-	cout << endl;
+	//cout << endl;
 }
 
 //Render
