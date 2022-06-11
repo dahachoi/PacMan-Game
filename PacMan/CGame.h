@@ -45,6 +45,11 @@ private:
 	const short unsigned mMaxScore;
 	short unsigned mGainPoints;
 
+	//Time
+	sf::Clock mClock;
+	sf::Time mTime;
+	int mChaseWave = 1;
+
 	//Functions
 	void PollEvents();
 
@@ -56,10 +61,10 @@ private:
 	void UpdatePacMan();
 	void UpdateGhosts();
 	void UpdateGhostTarget(const float&, const float&);
-	void ChooseAvailableDirections(const float&, const float&);
 	void UpdatePacManCollision();
 	void UpdateGhostCollision();
 	void UpdateCollision();
+	void UpdateGhostBehaviour();
 
 	//Render
 	void RenderMap();

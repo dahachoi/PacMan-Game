@@ -22,6 +22,33 @@ void CRedGhost::InitVariables()
 	mX = 13 * 27 + 13;
 	mY = 14 * 27 + 13;
 	mName = "Blinky";
+
+	//targetI = 26;
+	//targetJ = 14;
+	
+	targetI = 0;
+	targetJ = 16;
+}
+
+void CRedGhost::UpdateTarget(const float& x, const float& y) {
+	switch (mState) {
+	case BEHAVIOUR::SCATTER:
+		targetI = 0;
+		targetJ = 26;
+		break;
+	case BEHAVIOUR::CHASE:
+		targetI = y/27;
+		targetJ = x/27;
+		break;
+	case BEHAVIOUR::EATEN:
+		targetI = 14;
+		targetJ = 14.5;
+		break;
+	case BEHAVIOUR::FRIGHTENED:
+		targetI = rand() % 36;
+		targetJ = rand() % 28;
+		mMovementSpeed = 0.5;
+	}
 }
 
 void CRedGhost::InitSprite()

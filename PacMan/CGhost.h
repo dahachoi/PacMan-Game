@@ -23,9 +23,15 @@ public:
 	const sf::Vector2f GetGridCoordinate() const;
 	const DIRECTION& GetDir() const;
 	void SwitchDirection(const DIRECTION&);
+	const void SwitchScatter();
+	const void SwitchChase();
+	const void SwitchFrightened();
+	const void SwitchEaten();
+	const BEHAVIOUR& GetBehaviour() const;
+	const void ReverseDir();
 
 	//Update
-	void UpdateTarget(const float&, const float&);
+	virtual void UpdateTarget(const float&, const float&) = 0;
 	void ChooseNextTile();
 
 protected:
@@ -41,8 +47,10 @@ protected:
 	float mMovementSpeed = 1.f;
 	float mMovementX;
 	float mMovementY;
-	float targetX;
-	float targetY;
+
+	short targetI;
+	short targetJ;
+	
 	DIRECTION mDir = DIRECTION::RIGHT;
 
 	//Functions
@@ -52,6 +60,8 @@ protected:
 	void EatenState();
 	void UpdateMove();
 	bool TileBlocked(const DIRECTION&);
+	float CalculateDistance(const DIRECTION&);
+	bool SpecialIntersection();
 
 	//Initialization Functions
 	virtual void InitVariables() = 0;

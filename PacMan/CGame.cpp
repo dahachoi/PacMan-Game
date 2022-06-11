@@ -49,6 +49,7 @@ void CGame::UpdatePacMan() {
 }
 
 void CGame::UpdateGhosts() {
+	UpdateGhostBehaviour();
 	iRedGhost.Update();
 }
 
@@ -61,9 +62,9 @@ void CGame::UpdatePacManCollision() {
 
 	//side of screen
 	if (pacManX <= 0) {
-		if (pacManX == 0) {
+	/*	if (pacManX == 0) {
 			iMap.UpdateCoinCollision(pacManX, pacManY);
-		}
+		}*/
 
 		if (pacManX == -pacManWidth * 2 && pacManY == 17.f * 27.f) {
 			iPacMan.SetPosition(float(WIDTH) + pacManWidth + 13, pacManY + 13.f);
@@ -78,7 +79,9 @@ void CGame::UpdatePacManCollision() {
 	}
 
 	// Collision with wall
+	//cout << "pacManX, pacManY : " << pacManX << ", " << pacManY << endl;
 	if (fmod(pacManX, 27) == 0.0 && fmod(pacManY, 27) == 0.0 || iPacMan.IsStopped()) {
+		//cout << "pacman is on grid!" << endl;
 		UpdateGhostTarget(pacManX, pacManY);
 		if (!iMap.UpdateWallCollision(pacManX, pacManY, iPacMan.GetQuedDir())) {
 			iPacMan.SwitchDirection();
@@ -90,6 +93,12 @@ void CGame::UpdatePacManCollision() {
 		if (int gainPoints = iMap.UpdateCoinCollision(pacManX, pacManY)) {
 			//cout << "Collision! gained : " << gainPoints << endl;
 			mScore += gainPoints;
+
+			if (gainPoints == 50) {
+				iRedGhost.ReverseDir();
+				iRedGhost.SwitchFrightened();
+			}
+
 			cout << "mScore : " << mScore << endl;
 			//cout << "mScore : " << mScore << endl;
 			if (mScore == mMaxScore) {
@@ -116,35 +125,47 @@ void CGame::UpdateGhostCollision() {
 	//cout << "ghost : " << ghostX << ", " << ghostY << endl;
 
 	if (fmod(ghostX, 27) == 0.0 && fmod(ghostY, 27) == 0.0) {
-		if (iMap.UpdateWallCollision(ghostX, ghostY, iRedGhost.GetDir())) {
-			DIRECTION newDir;
-			do {
-				int randDir = rand() % 4;
-				switch (randDir) {
-				case 0:
-					newDir = DIRECTION::LEFT;
-					break;
-				case 1:
-					newDir = DIRECTION::RIGHT;
-					break;
-				case 2:
-					newDir = DIRECTION::UP;
-					break;
-				case 3:
-					newDir = DIRECTION::DOWN;
-					break;
-				}
-
-			} while (iMap.UpdateWallCollision(ghostX, ghostY, newDir));
-			iRedGhost.SwitchDirection(newDir);
-		}
-
-		//iRedGhost.SetPosition(ghostX, ghostY);
 		iRedGhost.ChooseNextTile();
 		//iCyanGhost.chooseNextTile();
 		//iPinkGhost.chooseNextTile();
 		//iYellowGhost.chooseNextTile();
 	}
+}
+
+void CGame::UpdateGhostBehaviour() {
+	mTime = mClock.getElapsedTime();
+	//cout << "Time : " << mTime.asSeconds() << endl;
+	BEHAVIOUR currBhvr = iRedGhost.GetBehaviour();
+	
+	bool switched = false;
+
+	//Switch From Scatter to Chase
+	if (currBhvr == BEHAVIOUR::SCATTER){
+		if (mTime.asSeconds() >= 7 && mChaseWave <= 2) {
+			iRedGhost.SwitchChase();
+			switched = true;
+			//and the others
+		}
+		else if (mTime.asSeconds() >= 5 && mChaseWave > 2 && mChaseWave <= 4) {
+			iRedGhost.SwitchChase();
+			switched = true;
+		}
+	}
+	
+	//Switch from Chase to Scatter
+	if (currBhvr == BEHAVIOUR::CHASE && mChaseWave != 4) {
+		if (mTime.asSeconds() >= 20) {
+			iRedGhost.SwitchScatter();
+			mChaseWave++;
+			switched = true;
+		}
+	}
+
+	if (switched) {
+		iRedGhost.ReverseDir();
+		mClock.restart();
+	}
+	
 }
 
 void CGame::UpdateCollision() {
