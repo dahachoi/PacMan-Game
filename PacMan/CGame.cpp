@@ -48,9 +48,13 @@ void CGame::UpdatePacMan() {
 	iPacMan.Update();
 }
 
-void CGame::UpdateCollision() {
-	sf::Vector2f pacManPos = iPacMan.GetGridCoordinate();
+void CGame::UpdateGhosts() {
+	iRedGhost.Update();
+}
+
+void CGame::UpdatePacManCollision() {
 	sf::CircleShape mPacMan = iPacMan.GetShape();
+	sf::Vector2f pacManPos = iPacMan.GetGridCoordinate();
 	float pacManX = pacManPos.x;
 	float pacManY = pacManPos.y;
 	const float pacManWidth = 44.f;
@@ -75,6 +79,7 @@ void CGame::UpdateCollision() {
 
 	// Collision with wall
 	if (fmod(pacManX, 27) == 0.0 && fmod(pacManY, 27) == 0.0 || iPacMan.IsStopped()) {
+		UpdateGhostTarget(pacManX, pacManY);
 		if (!iMap.UpdateWallCollision(pacManX, pacManY, iPacMan.GetQuedDir())) {
 			iPacMan.SwitchDirection();
 		}
@@ -96,19 +101,61 @@ void CGame::UpdateCollision() {
 	//cout << endl;
 }
 
+void CGame::UpdateGhostTarget(const float& pacManX, const float& pacManY) {
+	iRedGhost.UpdateTarget(pacManX, pacManY);
+	//iCyanGhost.Update.......
+	//....
+}
+
+void CGame::UpdateGhostCollision() {
+	sf::Sprite mGhost = iRedGhost.GetShape();
+	sf::Vector2f mGhostPos = iRedGhost.GetGridCoordinate();
+	float ghostX = mGhostPos.x;
+	float ghostY = mGhostPos.y;
+
+	//cout << "ghost : " << ghostX << ", " << ghostY << endl;
+
+	if (fmod(ghostX, 27) == 0.0 && fmod(ghostY, 27) == 0.0) {
+		if (iMap.UpdateWallCollision(ghostX, ghostY, iRedGhost.GetDir())) {
+			DIRECTION newDir;
+			do {
+				int randDir = rand() % 4;
+				switch (randDir) {
+				case 0:
+					newDir = DIRECTION::LEFT;
+					break;
+				case 1:
+					newDir = DIRECTION::RIGHT;
+					break;
+				case 2:
+					newDir = DIRECTION::UP;
+					break;
+				case 3:
+					newDir = DIRECTION::DOWN;
+					break;
+				}
+
+			} while (iMap.UpdateWallCollision(ghostX, ghostY, newDir));
+			iRedGhost.SwitchDirection(newDir);
+		}
+
+		//iRedGhost.SetPosition(ghostX, ghostY);
+		iRedGhost.ChooseNextTile();
+		//iCyanGhost.chooseNextTile();
+		//iPinkGhost.chooseNextTile();
+		//iYellowGhost.chooseNextTile();
+	}
+}
+
+void CGame::UpdateCollision() {
+	UpdatePacManCollision();
+	UpdateGhostCollision();
+}
+
 //Render
 
-void CGame::RenderTestGhost() {
-	sf::Sprite ghost;
-	sf::Texture ghostTexture;
-	ghostTexture.loadFromFile("Game_Resources/Ghosts/CyanDown.png");
-
-	ghost.setTexture(ghostTexture);
-	ghost.setOrigin(ghost.getGlobalBounds().width / 2, ghost.getGlobalBounds().height / 2);
-
-	ghost.setPosition(9 * 27 + 13, 14 * 27 + 13);
-
-	mWindow->draw(ghost);
+void CGame::RenderGhosts() {
+	iRedGhost.Render(mWindow);
 }
 
 void CGame::RenderMap() {
@@ -119,6 +166,7 @@ void CGame::Update() {
 	PollEvents();
 	if (!mEndGame) {
 		UpdatePacMan();
+		UpdateGhosts();
 		UpdateCollision();
 		//Update Game objects
 	}
@@ -128,7 +176,8 @@ void CGame::Render() {
 	mWindow->clear();
 	//render objects
 	RenderMap();
-	RenderTestGhost();
+	RenderGhosts();
+	//RenderTestGhost();
 
 	mWindow->display();
 }

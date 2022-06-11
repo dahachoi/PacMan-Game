@@ -152,21 +152,27 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CCoin.cpp" />
+    <ClCompile Include="CCyanGhost.cpp" />
     <ClCompile Include="CEnergizer.cpp" />
     <ClCompile Include="CGame.cpp" />
     <ClCompile Include="CGhost.cpp" />
     <ClCompile Include="CMap.cpp" />
     <ClCompile Include="CPacMan.cpp" />
+    <ClCompile Include="CRedGhost.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mapSketch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CCoin.h" />
+    <ClInclude Include="CCyanGhost.h" />
     <ClInclude Include="CEnergizer.h" />
     <ClInclude Include="CGame.h" />
     <ClInclude Include="CGhost.h" />
     <ClInclude Include="CMap.h" />
     <ClInclude Include="CPacMan.h" />
+    <ClInclude Include="CRedGhost.h" />
     <ClInclude Include="Direction.h" />
+    <ClInclude Include="mapSketch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

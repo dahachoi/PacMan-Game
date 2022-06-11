@@ -13,6 +13,7 @@
 
 #include "CMap.h"
 #include "CPacMan.h"
+#include "CRedGhost.h"
 
 class CGame
 {
@@ -38,6 +39,8 @@ private:
 	//Game Objects
 	CMap iMap;
 	CPacMan iPacMan;
+	CRedGhost iRedGhost;
+
 	short unsigned mScore;
 	const short unsigned mMaxScore;
 	short unsigned mGainPoints;
@@ -51,9 +54,15 @@ private:
 
 	//Update
 	void UpdatePacMan();
+	void UpdateGhosts();
+	void UpdateGhostTarget(const float&, const float&);
+	void ChooseAvailableDirections(const float&, const float&);
+	void UpdatePacManCollision();
+	void UpdateGhostCollision();
 	void UpdateCollision();
+
 	//Render
-	void RenderTestGhost();
 	void RenderMap();
+	void RenderGhosts();
 };
 
