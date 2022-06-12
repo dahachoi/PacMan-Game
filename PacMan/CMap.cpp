@@ -62,7 +62,7 @@ bool CMap::UpdateWallCollision(float& x, float& y, const DIRECTION& dir) {
 		break;
 	}
 
-	if (mMapSketch[i][j] == '#') return true;
+	if (mMapSketch[i][j] == '#' || mMapSketch[i][j] == '@') return true;
 
 	return false;
 }

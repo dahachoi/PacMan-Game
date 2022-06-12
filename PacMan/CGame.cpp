@@ -7,6 +7,7 @@ CGame::CGame()
 {
 	InitVariables();
 	InitWindow();
+	InitGhosts();
 }
 
 CGame::~CGame() {
@@ -37,6 +38,11 @@ void CGame::InitVariables() {
 	mGainPoints = 10;
 }
 
+void CGame::InitGhosts() {
+	mGhostContainer.push_back(new CRedGhost);
+	mGhostContainer.push_back(new CPinkGhost);
+}
+
 void CGame::InitWindow() {
 	mVideoMode = sf::VideoMode(WIDTH, HEIGHT);
 	mWindow = new sf::RenderWindow(mVideoMode, "PacMan", sf::Style::Close | sf::Style::Titlebar);
@@ -46,11 +52,20 @@ void CGame::InitWindow() {
 //Update
 void CGame::UpdatePacMan() {
 	iPacMan.Update();
+	UpdatePacManCollision();
 }
 
 void CGame::UpdateGhosts() {
-	UpdateGhostBehaviour();
-	iRedGhost.Update();
+	
+	for (auto i : mGhostContainer){
+		UpdateGhostBehaviour(i);
+		i->Update();
+		UpdateGhostCollision(i);
+	}
+	
+	//iRedGhost.Update();
+
+	
 }
 
 void CGame::UpdatePacManCollision() {
@@ -95,8 +110,18 @@ void CGame::UpdatePacManCollision() {
 			mScore += gainPoints;
 
 			if (gainPoints == 50) {
-				iRedGhost.ReverseDir();
-				iRedGhost.SwitchFrightened();
+				for (auto i : mGhostContainer) {
+					if (i->GetBehaviour() == BEHAVIOUR::FRIGHTENED) {
+						mFrightenedTime += mDeltaTime;
+					}
+					else mLastBhvr = i->GetBehaviour();
+
+					mFrightenedClock.restart();
+					i->SwitchFrightened();
+					i->ReverseDir();
+					cout << "ENTERED FRIGHTENED ----------------------------------------------------------------------------" << endl;
+				}
+
 			}
 
 			cout << "mScore : " << mScore << endl;
@@ -111,43 +136,84 @@ void CGame::UpdatePacManCollision() {
 }
 
 void CGame::UpdateGhostTarget(const float& pacManX, const float& pacManY) {
-	iRedGhost.UpdateTarget(pacManX, pacManY);
+	for (auto i : mGhostContainer) {
+		i->UpdateTarget(pacManX, pacManY);
+	}
+
+	//iRedGhost.UpdateTarget(pacManX, pacManY);
 	//iCyanGhost.Update.......
 	//....
 }
 
-void CGame::UpdateGhostCollision() {
-	sf::Sprite mGhost = iRedGhost.GetShape();
-	sf::Vector2f mGhostPos = iRedGhost.GetGridCoordinate();
+void CGame::UpdateGhostCollision(CGhost *ghost) {
+	sf::Sprite mGhost = ghost->GetShape();
+	sf::Vector2f mGhostPos = ghost->GetGridCoordinate();
 	float ghostX = mGhostPos.x;
 	float ghostY = mGhostPos.y;
+	float ghostWidth = 44.f;
+	
+	//side of screen
+	if (ghostX <= 0) {
+		/*	if (pacManX == 0) {
+				iMap.UpdateCoinCollision(pacManX, pacManY);
+			}*/
 
+		if (ghostX == -ghostWidth * 2 && ghostY == 17.f * 27.f) {
+			ghost->SetPosition(float(WIDTH) + ghostWidth + 13, ghostY + 13.f);
+		}
+		return;
+	}
+	else if (ghostX >= WIDTH) {
+		if (ghostX == WIDTH + ghostWidth && ghostY == 17.f * 27.f) {
+			ghost->SetPosition((13 - ghostWidth) * 2, ghostY + 13.f);
+		}
+		return;
+	}
 	//cout << "ghost : " << ghostX << ", " << ghostY << endl;
 
 	if (fmod(ghostX, 27) == 0.0 && fmod(ghostY, 27) == 0.0) {
-		iRedGhost.ChooseNextTile();
+		ghost->ChooseNextTile();
 		//iCyanGhost.chooseNextTile();
 		//iPinkGhost.chooseNextTile();
 		//iYellowGhost.chooseNextTile();
 	}
 }
 
-void CGame::UpdateGhostBehaviour() {
-	mTime = mClock.getElapsedTime();
+void CGame::UpdateGhostBehaviour(CGhost *ghost) {
 	//cout << "Time : " << mTime.asSeconds() << endl;
-	BEHAVIOUR currBhvr = iRedGhost.GetBehaviour();
+	BEHAVIOUR currBhvr = ghost->GetBehaviour();
 	
+	if (currBhvr == BEHAVIOUR::EATEN) {
+		sf::Vector2f pos = ghost->GetGridCoordinate();
+		if (pos.x == 13 * 27 && pos.y == 17 * 27) ghost->SwitchManualBhvr(mLastBhvr);
+		return;
+	}
+
+	if (currBhvr == BEHAVIOUR::FRIGHTENED) {
+		mDeltaTime = mFrightenedClock.getElapsedTime();
+		if (mDeltaTime.asSeconds() >= 8) {
+			mFrightenedTime += mDeltaTime;
+			ghost->SwitchManualBhvr(mLastBhvr);
+		}
+		return;
+	}
+	
+	mTime = mClock.getElapsedTime() - mFrightenedTime;
+	cout << "mTime : " << mTime.asSeconds() << endl;
+
 	bool switched = false;
 
 	//Switch From Scatter to Chase
 	if (currBhvr == BEHAVIOUR::SCATTER){
 		if (mTime.asSeconds() >= 7 && mChaseWave <= 2) {
-			iRedGhost.SwitchChase();
+			SwitchAllGhostBhvr(BEHAVIOUR::CHASE);
+			//ghost->SwitchChase();
 			switched = true;
 			//and the others
 		}
 		else if (mTime.asSeconds() >= 5 && mChaseWave > 2 && mChaseWave <= 4) {
-			iRedGhost.SwitchChase();
+			SwitchAllGhostBhvr(BEHAVIOUR::CHASE);
+			//ghost->SwitchChase();
 			switched = true;
 		}
 	}
@@ -155,28 +221,61 @@ void CGame::UpdateGhostBehaviour() {
 	//Switch from Chase to Scatter
 	if (currBhvr == BEHAVIOUR::CHASE && mChaseWave != 4) {
 		if (mTime.asSeconds() >= 20) {
-			iRedGhost.SwitchScatter();
+			SwitchAllGhostBhvr(BEHAVIOUR::SCATTER);
+			ghost->SwitchScatter();
 			mChaseWave++;
 			switched = true;
 		}
 	}
 
 	if (switched) {
-		iRedGhost.ReverseDir();
+		ghost->ReverseDir();
 		mClock.restart();
+		mFrightenedTime = sf::milliseconds(0);
 	}
 	
 }
 
-void CGame::UpdateCollision() {
-	UpdatePacManCollision();
-	UpdateGhostCollision();
+void CGame::SwitchAllGhostBhvr(const BEHAVIOUR& bhvr) {
+	for (auto i : mGhostContainer)
+		i->SwitchManualBhvr(bhvr);
+}
+
+void CGame::UpdateCollision(CGhost *ghost) {
+	sf::CircleShape mPacMan = iPacMan.GetShape();
+	sf::Sprite mGhost = ghost->GetShape();
+
+	bool collision = false;
+	if (mPacMan.getPosition().x == mGhost.getPosition().x) {
+		if (abs(mPacMan.getPosition().y - mGhost.getPosition().y) <= 27) collision = true;
+	}
+	else if (mPacMan.getPosition().y == mGhost.getPosition().y) {
+		if (abs(mPacMan.getPosition().x - mGhost.getPosition().x) <= 27) collision = true;
+
+	}
+
+	if (collision) {
+		if (ghost->GetBehaviour() == BEHAVIOUR::CHASE || ghost->GetBehaviour() == BEHAVIOUR::SCATTER) mEndGame = true;
+		else {
+			ghost->SwitchEaten();
+
+			sf::Clock coolDown;
+			sf::Time coolDownTime;
+			mScore += 200;
+		}
+	}
+
+
+	//UpdatePacManCollision();
+	//UpdateGhostCollision();
 }
 
 //Render
 
 void CGame::RenderGhosts() {
-	iRedGhost.Render(mWindow);
+	for (auto i : mGhostContainer) {
+		i->Render(mWindow);
+	}
 }
 
 void CGame::RenderMap() {
@@ -186,9 +285,14 @@ void CGame::RenderMap() {
 void CGame::Update() {
 	PollEvents();
 	if (!mEndGame) {
-		UpdatePacMan();
 		UpdateGhosts();
-		UpdateCollision();
+		UpdatePacMan();
+
+		for (auto i : mGhostContainer) {
+			UpdateCollision(i);
+		}
+		
+		//UpdateCollision();
 		//Update Game objects
 	}
 }

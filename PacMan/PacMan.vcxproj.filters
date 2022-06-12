@@ -45,6 +45,9 @@
     <ClCompile Include="mapSketch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CPinkGhost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGame.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="mapSketch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CPinkGhost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

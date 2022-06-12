@@ -1,38 +1,37 @@
-#include "CRedGhost.h"
+#include "CPinkGhost.h"
 
 using namespace std;
 
-CRedGhost::CRedGhost() {
+CPinkGhost::CPinkGhost()
+{
 	InitVariables();
 	InitSprite();
 }
 
-void CRedGhost::InitVariables()
-{
+
+void CPinkGhost::InitVariables(){
 	mMovementX = 1.f;
 	mMovementY = 0.f;
-	mDir = DIRECTION::RIGHT;
+	mDir = DIRECTION::LEFT;
 	mX = 14 * 27;
 	mY = 14 * 27 + 13;
-	mName = "Blinky";
+	mName = "Pinky";
 
 	targetI = 0;
-	targetJ = 16;
+	targetJ = 2;
 }
 
-
-void CRedGhost::InitSprite()
+void CPinkGhost::InitSprite()
 {
-	mTexture.loadFromFile("Game_resources/Ghosts/RedRight.png");
+	mTexture.loadFromFile("Game_resources/Ghosts/PinkLeft.png");
 	mGhost.setTexture(mTexture);
 
 	mGhost.setOrigin(mGhost.getGlobalBounds().width / 2, mGhost.getGlobalBounds().height / 2);
 	mGhost.setPosition(mX, mY);
 }
 
-
-void CRedGhost::UpdateTarget(const float& x, const float& y) {
-
+void CPinkGhost::UpdateTarget(const float& x, const float& y)
+{
 	if (IsInGhostBox() && mState != BEHAVIOUR::EATEN) {
 		targetI = 15;
 		targetJ = 14.5;
@@ -43,12 +42,12 @@ void CRedGhost::UpdateTarget(const float& x, const float& y) {
 	switch (mState) {
 	case BEHAVIOUR::SCATTER:
 		targetI = 0;
-		targetJ = 26;
+		targetJ = 2;
 		mMovementSpeed = 1.f;
 		break;
 	case BEHAVIOUR::CHASE:
-		targetI = y/27;
-		targetJ = x/27;
+		targetI = y / 27;
+		targetJ = x / 27;
 		mMovementSpeed = 1.f;
 		break;
 	case BEHAVIOUR::EATEN:
@@ -63,21 +62,21 @@ void CRedGhost::UpdateTarget(const float& x, const float& y) {
 	}
 }
 
-void CRedGhost::UpdateDirTexture()
+void CPinkGhost::UpdateDirTexture()
 {
 	if (mState == BEHAVIOUR::CHASE || mState == BEHAVIOUR::SCATTER) {
 		switch (mDir) {
 		case DIRECTION::LEFT:
-			mTexture.loadFromFile("Game_resources/Ghosts/RedLeft.png");
+			mTexture.loadFromFile("Game_resources/Ghosts/PinkLeft.png");
 			break;
 		case DIRECTION::RIGHT:
-			mTexture.loadFromFile("Game_resources/Ghosts/RedRight.png");
+			mTexture.loadFromFile("Game_resources/Ghosts/PinkRight.png");
 			break;
 		case DIRECTION::UP:
-			mTexture.loadFromFile("Game_resources/Ghosts/RedUP.png");
+			mTexture.loadFromFile("Game_resources/Ghosts/PinkUP.png");
 			break;
 		case DIRECTION::DOWN:
-			mTexture.loadFromFile("Game_resources/Ghosts/RedDown.png");
+			mTexture.loadFromFile("Game_resources/Ghosts/PinkDown.png");
 			break;
 		}
 	}
@@ -99,12 +98,11 @@ void CRedGhost::UpdateDirTexture()
 	}
 	else {
 		mFrightenedTime = mFrightenedClock.getElapsedTime();
-		cout << "mFrightenedTime : " <<mFrightenedTime.asSeconds()<< endl;
+		cout << "mFrightenedTime : " << mFrightenedTime.asSeconds() << endl;
 		if (mFrightenedTime.asSeconds() >= 5) {
 			if (BlinkFrightenedTextures()) mTexture.loadFromFile("Game_resources/Ghosts/FrightenedGhost.png");
 			else mTexture.loadFromFile("Game_resources/Ghosts/FrightenedCoolDown.png");
 		}
 		else mTexture.loadFromFile("Game_resources/Ghosts/FrightenedGhost.png");
 	}
-
 }

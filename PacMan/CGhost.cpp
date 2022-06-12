@@ -2,19 +2,16 @@
 
 using namespace std;
 
-void CGhost::FrightenedState()
-{
-}
-
-void CGhost::EatenState()
-{
-}
-
 void CGhost::SetPosition(const float& x, const float& y) {
 	mX = x;
 	mY = y;
 
 	mGhost.setPosition(mX, mY);
+}
+
+void CGhost::StopGhost() {
+	mMovementX = 0.f;
+	mMovementY = 0.f;
 }
 
 const sf::Sprite& CGhost::GetShape() const {
@@ -34,40 +31,51 @@ const DIRECTION& CGhost::GetDir() const {
 
 const void CGhost::SwitchScatter() {
 	mState = BEHAVIOUR::SCATTER;
+	UpdateDirTexture();
 }
 const void CGhost::SwitchChase(){
 	mState = BEHAVIOUR::CHASE;
+	UpdateDirTexture();
 }
 const void CGhost::SwitchFrightened() {
 	mState = BEHAVIOUR::FRIGHTENED;
+	mFrightenedClock.restart();
+	UpdateDirTexture();
 }
 const void CGhost::SwitchEaten() {
 	mState = BEHAVIOUR::EATEN;
+	UpdateDirTexture();
+}
+
+void CGhost::SwitchManualBhvr(const BEHAVIOUR& bhvr) {
+	mState = bhvr;
+	UpdateDirTexture();
 }
 
 const BEHAVIOUR& CGhost::GetBehaviour() const{
 	return mState;
 }
 
+bool CGhost::IsInGhostBox() {
+	return mGhost.getPosition().x >= 11 * 27 + 13 && mGhost.getPosition().x <= 16 * 27 + 13 && mGhost.getPosition().y >= 16 * 27 + 13 && mGhost.getPosition().y <= 18 * 27 + 13;
+}
+
 void CGhost::ChooseNextTile() {
+
 	set<DIRECTION> availableDirs = { DIRECTION::LEFT, DIRECTION::RIGHT, DIRECTION::UP, DIRECTION::DOWN };
 
 	//remove 180 degree direction
 	switch (mDir) {
 	case DIRECTION::LEFT:
-		//cout << "erased right as opposite" << endl;
 		availableDirs.erase(DIRECTION::RIGHT);
 		break;
 	case DIRECTION::RIGHT:
-		//cout << "erased left as opposite" << endl;
 		availableDirs.erase(DIRECTION::LEFT);
 		break;
 	case DIRECTION::UP:
-		//cout << "erased down as opposite" << endl;
 		availableDirs.erase(DIRECTION::DOWN);
 		break;
 	case DIRECTION::DOWN:
-		//cout << "erased up as opposite" << endl;
 		availableDirs.erase(DIRECTION::UP);
 		break;
 	}
@@ -144,27 +152,8 @@ float CGhost::CalculateDistance(const DIRECTION& dir) {
 }
 
 bool CGhost::TileBlocked(const DIRECTION& dir) {
-	//cout << "checking : ";
-	//switch (dir) {
-	//case DIRECTION::LEFT:
-	//	cout << "LEFT" << endl;
-	//	break;
-	//case DIRECTION::RIGHT:
-	//	cout << "RIGHT" << endl;
-	//	break;
-	//case DIRECTION::UP:
-	//	cout << "UP" << endl;
-	//	break;
-	//case DIRECTION::DOWN:
-	//	cout << "DOWN" << endl;
-	//	break;
-	//}
-
-	//cout << "mX, mY : " << mX - 13 << ", " << mY - 13<< endl;
-
 	int i = static_cast<int>((mY - 13) / 27);
 	int j = static_cast<int>((mX - 13) / 27);
-	//cout << "current: i, j :" << i << ", " << j << endl;
 
 	switch (dir) {
 	case DIRECTION::RIGHT:
@@ -180,12 +169,12 @@ bool CGhost::TileBlocked(const DIRECTION& dir) {
 		i--;
 		break;
 	}
-	//cout << "checking i, j :" << i << ", " << j << endl;
+
 	if (mMapSketch[i][j] == '#') {
-		//cout << "wall!" << endl<<endl;
 		return true;
 	}
-	//cout << "no wall!" << endl << endl;
+	else if (mMapSketch[i][j] == '@' && !IsInGhostBox() && mState != BEHAVIOUR::EATEN) return true;
+
 	return false;
 }
 
@@ -233,6 +222,13 @@ void CGhost::SwitchDirection(const DIRECTION& dir) {
 	UpdateDirTexture();
 }
 
+bool CGhost::BlinkFrightenedTextures() {
+	mBlinkTimer++;
+	if (mBlinkTimer <= 50) return true;
+	else if (mBlinkTimer <= 100) return false;
+	else mBlinkTimer = 0;
+}
+
 void CGhost::UpdateMove(){
 	mGhost.move(mMovementX, mMovementY);
 	mX = mGhost.getPosition().x;
@@ -241,6 +237,7 @@ void CGhost::UpdateMove(){
 
 void CGhost::Update() {
 	UpdateMove();
+	UpdateDirTexture();
 }
 
 void CGhost::Render(sf::RenderTarget* target){

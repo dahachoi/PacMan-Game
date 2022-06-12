@@ -2,9 +2,9 @@
 
 #include "CGhost.h"
 
-class CCyanGhost : public CGhost {
+class CPinkGhost : public CGhost {
 public:
-	CCyanGhost();
+	CPinkGhost();
 
 	//Update
 	void UpdateTarget(const float&, const float&) override;

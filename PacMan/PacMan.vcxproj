@@ -158,6 +158,7 @@
     <ClCompile Include="CGhost.cpp" />
     <ClCompile Include="CMap.cpp" />
     <ClCompile Include="CPacMan.cpp" />
+    <ClCompile Include="CPinkGhost.cpp" />
     <ClCompile Include="CRedGhost.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mapSketch.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="CGhost.h" />
     <ClInclude Include="CMap.h" />
     <ClInclude Include="CPacMan.h" />
+    <ClInclude Include="CPinkGhost.h" />
     <ClInclude Include="CRedGhost.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="mapSketch.h" />

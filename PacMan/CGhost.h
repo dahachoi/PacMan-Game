@@ -8,7 +8,7 @@
 #include "Direction.h"
 #include "mapSketch.h"
 
-enum class	BEHAVIOUR{SCATTER = 0, CHASE, FRIGHTENED, EATEN};
+enum class	BEHAVIOUR{NONE = 0, SCATTER, CHASE, FRIGHTENED, EATEN};
 
 class CGhost
 {
@@ -16,9 +16,9 @@ public:
 	CGhost() = default;
 	virtual void Update();
 	virtual void Render(sf::RenderTarget*);
-
 	//Helpers
 	void SetPosition(const float&, const float&);
+	void StopGhost();
 	const sf::Sprite& GetShape() const;
 	const sf::Vector2f GetGridCoordinate() const;
 	const DIRECTION& GetDir() const;
@@ -27,6 +27,7 @@ public:
 	const void SwitchChase();
 	const void SwitchFrightened();
 	const void SwitchEaten();
+	void SwitchManualBhvr(const BEHAVIOUR&);
 	const BEHAVIOUR& GetBehaviour() const;
 	const void ReverseDir();
 
@@ -51,17 +52,21 @@ protected:
 	short targetI;
 	short targetJ;
 	
-	DIRECTION mDir = DIRECTION::RIGHT;
+	DIRECTION mDir;
+
+	sf::Clock mFrightenedClock;
+	sf::Time mFrightenedTime;
 
 	//Functions
-	virtual void ScatterState() = 0;
-	virtual void ChaseState() = 0;
 	void FrightenedState();
 	void EatenState();
 	void UpdateMove();
 	bool TileBlocked(const DIRECTION&);
+	bool IsInGhostBox();
 	float CalculateDistance(const DIRECTION&);
 	bool SpecialIntersection();
+	bool BlinkFrightenedTextures();
+	int mBlinkTimer = 0;
 
 	//Initialization Functions
 	virtual void InitVariables() = 0;
