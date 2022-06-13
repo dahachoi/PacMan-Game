@@ -15,6 +15,8 @@
 #include "CPacMan.h"
 #include "CRedGhost.h"
 #include "CPinkGhost.h"
+#include "CCyanGhost.h"
+#include "CYellowGhost.h"
 
 class CGame
 {
@@ -41,7 +43,6 @@ private:
 	CMap iMap;
 	CPacMan iPacMan;
 	std::vector<CGhost*> mGhostContainer;
-	CRedGhost iRedGhost;
 
 	short unsigned mScore;
 	const short unsigned mMaxScore;
@@ -68,7 +69,7 @@ private:
 	//Update
 	void UpdatePacMan();
 	void UpdateGhosts();
-	void UpdateGhostTarget(const float&, const float&);
+	void UpdateGhostTarget(const float&, const float&, const DIRECTION&);
 	void UpdatePacManCollision();
 	void UpdateGhostCollision(CGhost*);
 	void UpdateCollision(CGhost *);

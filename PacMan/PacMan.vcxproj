@@ -160,6 +160,7 @@
     <ClCompile Include="CPacMan.cpp" />
     <ClCompile Include="CPinkGhost.cpp" />
     <ClCompile Include="CRedGhost.cpp" />
+    <ClCompile Include="CYellowGhost.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mapSketch.cpp" />
   </ItemGroup>
@@ -173,6 +174,7 @@
     <ClInclude Include="CPacMan.h" />
     <ClInclude Include="CPinkGhost.h" />
     <ClInclude Include="CRedGhost.h" />
+    <ClInclude Include="CYellowGhost.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="mapSketch.h" />
   </ItemGroup>

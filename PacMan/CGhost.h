@@ -22,6 +22,8 @@ public:
 	const sf::Sprite& GetShape() const;
 	const sf::Vector2f GetGridCoordinate() const;
 	const DIRECTION& GetDir() const;
+	const bool& ComeOutBox() const;
+
 	void SwitchDirection(const DIRECTION&);
 	const void SwitchScatter();
 	const void SwitchChase();
@@ -30,11 +32,13 @@ public:
 	void SwitchManualBhvr(const BEHAVIOUR&);
 	const BEHAVIOUR& GetBehaviour() const;
 	const void ReverseDir();
+	void MoveInGhostBox();
+	bool mGoingUp = true;
 
 	//Update
-	virtual void UpdateTarget(const float&, const float&) = 0;
 	void ChooseNextTile();
-
+	virtual void UpdateTarget(const float&, const float&, const DIRECTION&, const float&, const float&) = 0;
+	virtual void CalculateTarget(const float&, const float&, const DIRECTION&, const float&, const float&) = 0;
 protected:
 	BEHAVIOUR mState = BEHAVIOUR::SCATTER;
 	std::string mName;
@@ -48,9 +52,10 @@ protected:
 	float mMovementSpeed = 1.f;
 	float mMovementX;
 	float mMovementY;
+	bool mInGhostBox;
 
-	short targetI;
-	short targetJ;
+	int targetI;
+	int targetJ;
 	
 	DIRECTION mDir;
 

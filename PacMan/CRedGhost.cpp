@@ -12,12 +12,14 @@ void CRedGhost::InitVariables()
 	mMovementX = 1.f;
 	mMovementY = 0.f;
 	mDir = DIRECTION::RIGHT;
-	mX = 14 * 27;
+	mX = 16 * 27;
 	mY = 14 * 27 + 13;
 	mName = "Blinky";
 
 	targetI = 0;
 	targetJ = 16;
+
+	mInGhostBox = false;
 }
 
 
@@ -31,11 +33,10 @@ void CRedGhost::InitSprite()
 }
 
 
-void CRedGhost::UpdateTarget(const float& x, const float& y) {
-
+void CRedGhost::UpdateTarget(const float& pacManX, const float& pacManY, const DIRECTION& pacManDir, const float& blinkyX, const float& blinkyY) {
 	if (IsInGhostBox() && mState != BEHAVIOUR::EATEN) {
 		targetI = 15;
-		targetJ = 14.5;
+		targetJ = 14;
 		mMovementSpeed = .5f;
 		return;
 	}
@@ -47,8 +48,7 @@ void CRedGhost::UpdateTarget(const float& x, const float& y) {
 		mMovementSpeed = 1.f;
 		break;
 	case BEHAVIOUR::CHASE:
-		targetI = y/27;
-		targetJ = x/27;
+		CalculateTarget(pacManX, pacManY, pacManDir, blinkyX, blinkyY);
 		mMovementSpeed = 1.f;
 		break;
 	case BEHAVIOUR::EATEN:
@@ -61,6 +61,12 @@ void CRedGhost::UpdateTarget(const float& x, const float& y) {
 		targetJ = rand() % 28;
 		mMovementSpeed = 0.5;
 	}
+}
+
+void CRedGhost::CalculateTarget(const float& pacManX, const float& pacManY, const DIRECTION& pacManDir, const float& blinkyX, const float& blinkyY) {
+	//Blinkys target is just pacmans location.
+	targetI = static_cast<int>(pacManY/ 27);
+	targetJ = static_cast<int>(pacManX / 27);
 }
 
 void CRedGhost::UpdateDirTexture()
@@ -99,7 +105,6 @@ void CRedGhost::UpdateDirTexture()
 	}
 	else {
 		mFrightenedTime = mFrightenedClock.getElapsedTime();
-		cout << "mFrightenedTime : " <<mFrightenedTime.asSeconds()<< endl;
 		if (mFrightenedTime.asSeconds() >= 5) {
 			if (BlinkFrightenedTextures()) mTexture.loadFromFile("Game_resources/Ghosts/FrightenedGhost.png");
 			else mTexture.loadFromFile("Game_resources/Ghosts/FrightenedCoolDown.png");

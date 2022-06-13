@@ -48,6 +48,9 @@
     <ClCompile Include="CPinkGhost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CYellowGhost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CGame.h">
@@ -81,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CPinkGhost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CYellowGhost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

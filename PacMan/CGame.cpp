@@ -41,6 +41,8 @@ void CGame::InitVariables() {
 void CGame::InitGhosts() {
 	mGhostContainer.push_back(new CRedGhost);
 	mGhostContainer.push_back(new CPinkGhost);
+	mGhostContainer.push_back(new CCyanGhost);
+	mGhostContainer.push_back(new CYellowGhost);
 }
 
 void CGame::InitWindow() {
@@ -58,6 +60,10 @@ void CGame::UpdatePacMan() {
 void CGame::UpdateGhosts() {
 	
 	for (auto i : mGhostContainer){
+		//if i is in ghost box, go up and down.
+		//if (i->ComeOutBox()) {
+		//	i->MoveInGhostBox();
+		//}
 		UpdateGhostBehaviour(i);
 		i->Update();
 		UpdateGhostCollision(i);
@@ -97,7 +103,7 @@ void CGame::UpdatePacManCollision() {
 	//cout << "pacManX, pacManY : " << pacManX << ", " << pacManY << endl;
 	if (fmod(pacManX, 27) == 0.0 && fmod(pacManY, 27) == 0.0 || iPacMan.IsStopped()) {
 		//cout << "pacman is on grid!" << endl;
-		UpdateGhostTarget(pacManX, pacManY);
+		UpdateGhostTarget(pacManX, pacManY, iPacMan.GetCurrDir());
 		if (!iMap.UpdateWallCollision(pacManX, pacManY, iPacMan.GetQuedDir())) {
 			iPacMan.SwitchDirection();
 		}
@@ -111,7 +117,7 @@ void CGame::UpdatePacManCollision() {
 
 			if (gainPoints == 50) {
 				for (auto i : mGhostContainer) {
-					if (i->GetBehaviour() == BEHAVIOUR::FRIGHTENED) {
+					if (i->GetBehaviour() == BEHAVIOUR::FRIGHTENED || i->GetBehaviour() == BEHAVIOUR::EATEN) {
 						mFrightenedTime += mDeltaTime;
 					}
 					else mLastBhvr = i->GetBehaviour();
@@ -135,10 +141,13 @@ void CGame::UpdatePacManCollision() {
 	//cout << endl;
 }
 
-void CGame::UpdateGhostTarget(const float& pacManX, const float& pacManY) {
+void CGame::UpdateGhostTarget(const float& pacManX, const float& pacManY, const DIRECTION& pacManDir) {
+	sf::Vector2f blinkyPos = mGhostContainer[0]->GetGridCoordinate();
+
 	for (auto i : mGhostContainer) {
-		i->UpdateTarget(pacManX, pacManY);
+		i->UpdateTarget(pacManX, pacManY, pacManDir, blinkyPos.x, blinkyPos.y);
 	}
+
 
 	//iRedGhost.UpdateTarget(pacManX, pacManY);
 	//iCyanGhost.Update.......
@@ -173,9 +182,6 @@ void CGame::UpdateGhostCollision(CGhost *ghost) {
 
 	if (fmod(ghostX, 27) == 0.0 && fmod(ghostY, 27) == 0.0) {
 		ghost->ChooseNextTile();
-		//iCyanGhost.chooseNextTile();
-		//iPinkGhost.chooseNextTile();
-		//iYellowGhost.chooseNextTile();
 	}
 }
 
@@ -199,7 +205,7 @@ void CGame::UpdateGhostBehaviour(CGhost *ghost) {
 	}
 	
 	mTime = mClock.getElapsedTime() - mFrightenedTime;
-	cout << "mTime : " << mTime.asSeconds() << endl;
+	//cout << "mTime : " << mTime.asSeconds() << endl;
 
 	bool switched = false;
 
@@ -229,7 +235,9 @@ void CGame::UpdateGhostBehaviour(CGhost *ghost) {
 	}
 
 	if (switched) {
-		ghost->ReverseDir();
+		for (auto i : mGhostContainer) {
+			i->ReverseDir();
+		}
 		mClock.restart();
 		mFrightenedTime = sf::milliseconds(0);
 	}

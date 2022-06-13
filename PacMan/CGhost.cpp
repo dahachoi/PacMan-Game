@@ -56,12 +56,19 @@ const BEHAVIOUR& CGhost::GetBehaviour() const{
 	return mState;
 }
 
+const bool& CGhost::ComeOutBox() const {
+	return mInGhostBox;
+}
+
 bool CGhost::IsInGhostBox() {
 	return mGhost.getPosition().x >= 11 * 27 + 13 && mGhost.getPosition().x <= 16 * 27 + 13 && mGhost.getPosition().y >= 16 * 27 + 13 && mGhost.getPosition().y <= 18 * 27 + 13;
 }
 
-void CGhost::ChooseNextTile() {
+void CGhost::MoveInGhostBox() {
 
+}
+
+void CGhost::ChooseNextTile() {
 	set<DIRECTION> availableDirs = { DIRECTION::LEFT, DIRECTION::RIGHT, DIRECTION::UP, DIRECTION::DOWN };
 
 	//remove 180 degree direction
@@ -145,10 +152,10 @@ float CGhost::CalculateDistance(const DIRECTION& dir) {
 	int y = abs(targetI - i);
 	int x = abs(targetJ - j);
 
-	float distance = sqrt(pow(y, 2) + pow(x, 2));
+	double distance = sqrt(pow(y, 2) + pow(x, 2));
 	//cout << "distance : " << distance << endl;
 
-	return distance;
+	return static_cast<float>(distance);
 }
 
 bool CGhost::TileBlocked(const DIRECTION& dir) {
@@ -227,6 +234,9 @@ bool CGhost::BlinkFrightenedTextures() {
 	if (mBlinkTimer <= 50) return true;
 	else if (mBlinkTimer <= 100) return false;
 	else mBlinkTimer = 0;
+
+	//this will do nothing
+	return false;
 }
 
 void CGhost::UpdateMove(){
